@@ -1,16 +1,16 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { Box, Button, Container, Drawer, Grid, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Container, Drawer, Grid, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { MOCK_ADS } from '@/mocks/itemsMock';
+import { useItemsQuery } from '@/hooks/useItemsQuery';
+import { PAGE_SIZE, useAdsStore } from '@/stores/adsStore';
 
 import FiltersPanel from './components/FiltersPanel';
 import PageHeader from './components/PageHeader';
 import Pagination from './components/Pagination';
 import ProductCard from './components/ProductCard';
 import SearchBar from './components/SearchBar';
-import { useAdsFilter } from './hooks/useAdsFilter';
 
 const ADS_PLURAL: [string, string, string] = ['объявление', 'объявления', 'объявлений'];
 
@@ -25,9 +25,6 @@ const AdsListPage = () => {
     filterNeedsRevision,
     layout,
     page,
-    filtered,
-    paginatedItems,
-    pageCount,
     setSearch,
     setSort,
     setLayout,
@@ -35,7 +32,24 @@ const AdsListPage = () => {
     setFilterNeedsRevision,
     setPage,
     resetFilters,
-  } = useAdsFilter(MOCK_ADS);
+  } = useAdsStore();
+
+  const pageSize = PAGE_SIZE[layout];
+  const [sortColumn, sortDirection] = sort.split('_') as [string, 'asc' | 'desc'];
+
+  const { data, isLoading, isError } = useItemsQuery({
+    q: search.trim() || undefined,
+    limit: pageSize,
+    skip: (page - 1) * pageSize,
+    needsRevision: filterNeedsRevision || undefined,
+    categories: selectedCategories.length > 0 ? selectedCategories.join(',') : undefined,
+    sortColumn,
+    sortDirection,
+  });
+
+  const items = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const pageCount = Math.ceil(total / pageSize);
 
   const filtersPanelProps = {
     selectedCategories,
@@ -58,10 +72,7 @@ const AdsListPage = () => {
               gap: 1,
             }}
           >
-            <PageHeader
-              count={filtered.length}
-              pluralWords={ADS_PLURAL}
-            />
+            <PageHeader count={total} pluralWords={ADS_PLURAL} />
 
             <Button
               variant="outlined"
@@ -90,7 +101,15 @@ const AdsListPage = () => {
               </Box>
 
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                {paginatedItems.length === 0 ? (
+                {isLoading ? (
+                  <Box sx={{ py: 10, display: 'flex', justifyContent: 'center' }}>
+                    <CircularProgress />
+                  </Box>
+                ) : isError ? (
+                  <Box sx={{ py: 10, textAlign: 'center' }}>
+                    <Typography color="error">Не удалось загрузить объявления</Typography>
+                  </Box>
+                ) : items.length === 0 ? (
                   <Box sx={{ py: 10, textAlign: 'center' }}>
                     <Typography color="text.secondary">
                       {search.trim()
@@ -100,7 +119,7 @@ const AdsListPage = () => {
                   </Box>
                 ) : (
                   <Grid container spacing={1.5}>
-                    {paginatedItems.map((item) => (
+                    {items.map((item) => (
                       <Grid
                         key={item.id}
                         size={layout === 'grid' ? { xs: 12, sm: 6, md: 4, lg: 2.4 } : { xs: 12 }}
