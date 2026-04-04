@@ -11,10 +11,44 @@ type ProductCardProps = {
   price: number;
   imageUrl?: string;
   needsRevision: boolean;
+  layout?: 'grid' | 'list';
   onClick?: () => void;
 };
 
-const ProductCard = ({
+const CardImage = ({ imageUrl, title }: { imageUrl?: string; title: string }) =>
+  imageUrl ? (
+    <CardMedia
+      component="img"
+      image={imageUrl}
+      alt={title}
+      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+    />
+  ) : (
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'grey.100',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <ImageOutlinedIcon sx={{ fontSize: 48, color: 'grey.400' }} />
+    </Box>
+  );
+
+const RevisionBadge = () => (
+  <Chip
+    icon={<CircleIcon sx={{ fontSize: '6px !important' }} />}
+    label="Требует доработок"
+    color="warning"
+    size="small"
+    sx={{ alignSelf: 'flex-start' }}
+  />
+);
+
+const GridCard = ({
   category,
   title,
   price,
@@ -22,14 +56,7 @@ const ProductCard = ({
   needsRevision,
   onClick,
 }: ProductCardProps) => (
-  <Card
-    sx={{
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-    }}
-  >
+  <Card sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
     <CardActionArea
       onClick={onClick}
       sx={{
@@ -41,34 +68,9 @@ const ProductCard = ({
       }}
     >
       <Box sx={{ position: 'relative', flexShrink: 0 }}>
-        <Box
-          sx={{
-            borderRadius: 1,
-            overflow: 'hidden',
-          }}
-        >
-          {imageUrl ? (
-            <CardMedia
-              component="img"
-              image={imageUrl}
-              alt={title}
-              sx={{ aspectRatio: '4/3', objectFit: 'cover', display: 'block', width: '100%' }}
-            />
-          ) : (
-            <Box
-              sx={{
-                aspectRatio: '4/3',
-                backgroundColor: 'grey.100',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <ImageOutlinedIcon sx={{ fontSize: 64, color: 'grey.400' }} />
-            </Box>
-          )}
+        <Box sx={{ borderRadius: 1, overflow: 'hidden', aspectRatio: '4/3' }}>
+          <CardImage imageUrl={imageUrl} title={title} />
         </Box>
-
         <Chip
           label={getCategoryLabel(category)}
           variant="outlined"
@@ -111,18 +113,74 @@ const ProductCard = ({
           {price.toLocaleString('ru-RU')} ₽
         </Typography>
 
-        {needsRevision && (
-          <Chip
-            icon={<CircleIcon sx={{ fontSize: '6px !important' }} />}
-            label="Требует доработок"
-            color="warning"
-            size="small"
-            sx={{ alignSelf: 'flex-start' }}
-          />
-        )}
+        {needsRevision && <RevisionBadge />}
       </CardContent>
     </CardActionArea>
   </Card>
 );
+
+const ListCard = ({
+  category,
+  title,
+  price,
+  imageUrl,
+  needsRevision,
+  onClick,
+}: ProductCardProps) => (
+  <Card sx={{ width: '100%' }}>
+    <CardActionArea
+      onClick={onClick}
+      sx={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}
+    >
+      <Box
+        sx={{
+          width: 160,
+          flexShrink: 0,
+          borderRadius: 1,
+          overflow: 'hidden',
+          aspectRatio: '4/3',
+        }}
+      >
+        <CardImage imageUrl={imageUrl} title={title} />
+      </Box>
+
+      <CardContent
+        sx={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 0.5,
+          py: 2,
+          '&:last-child': { pb: 2 },
+        }}
+      >
+        <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+          {getCategoryLabel(category)}
+        </Typography>
+
+        <Typography
+          variant="h4"
+          sx={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+          }}
+        >
+          {title}
+        </Typography>
+
+        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 'auto' }}>
+          {price.toLocaleString('ru-RU')} ₽
+        </Typography>
+
+        {needsRevision && <RevisionBadge />}
+      </CardContent>
+    </CardActionArea>
+  </Card>
+);
+
+const ProductCard = (props: ProductCardProps) =>
+  props.layout === 'list' ? <ListCard {...props} /> : <GridCard {...props} />;
 
 export default ProductCard;

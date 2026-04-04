@@ -33,6 +33,7 @@ export const Default: Story = {
     title: 'Наушники Sony WH-1000XM5 с шумоподавлением',
     price: 32990,
     needsRevision: false,
+    layout: 'grid',
   },
 };
 
@@ -44,6 +45,7 @@ export const WithImage: Story = {
     imageUrl:
       'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=400&q=80',
     needsRevision: false,
+    layout: 'list',
   },
 };
 
@@ -53,6 +55,7 @@ export const NeedsRevision: Story = {
     title: 'Студия у метро Речной вокзал',
     price: 5800000,
     needsRevision: true,
+    layout: 'grid',
   },
 };
 
@@ -64,5 +67,6 @@ export const NeedsRevisionWithImage: Story = {
     imageUrl:
       'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=400&q=80',
     needsRevision: true,
+    layout: 'list',
   },
 };
