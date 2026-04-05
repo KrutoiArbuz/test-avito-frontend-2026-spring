@@ -1,7 +1,7 @@
 import CircleIcon from '@mui/icons-material/Circle';
-import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
-import { Box, Card, CardActionArea, CardContent, CardMedia, Chip, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Chip, Typography } from '@mui/material';
 
+import CardImage from '@/components/CardImage';
 import type { CategoryType } from '@/types/itemTypes';
 import type { LayoutType } from '@/types/layoutType';
 import { getCategoryLabel } from '@/utils/normalizers';
@@ -15,29 +15,6 @@ type ProductCardProps = {
   layout?: LayoutType;
   onClick?: () => void;
 };
-
-const CardImage = ({ imageUrl, title }: { imageUrl?: string; title: string }) =>
-  imageUrl ? (
-    <CardMedia
-      component="img"
-      image={imageUrl}
-      alt={title}
-      sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-    />
-  ) : (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: 'grey.100',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <ImageOutlinedIcon sx={{ fontSize: 48, color: 'grey.400' }} />
-    </Box>
-  );
 
 const RevisionBadge = () => (
   <Chip

@@ -75,4 +75,6 @@ export type ItemsQueryParamsApi = {
 
 export type ItemListItemModel = ItemListItemApi;
 
-export type ItemModel = ItemApi;
+export type ItemModel = ItemApi & {
+  missingFields: string[];
+};
