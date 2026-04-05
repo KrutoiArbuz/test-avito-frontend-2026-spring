@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 
-import SearchBar, { type Layout } from './SearchBar';
+import type { LayoutType } from '@/types/layoutType';
+
+import SearchBar from './SearchBar';
 
 const meta: Meta<typeof SearchBar> = {
   title: 'Components/SearchBar',
@@ -15,7 +17,7 @@ type Story = StoryObj<typeof SearchBar>;
 export const Default: Story = {
   render: () => {
     const [search, setSearch] = useState('');
-    const [layout, setLayout] = useState<Layout>('grid');
+    const [layout, setLayout] = useState<LayoutType>('grid');
     const [sort, setSort] = useState('createdAt_desc');
 
     return (

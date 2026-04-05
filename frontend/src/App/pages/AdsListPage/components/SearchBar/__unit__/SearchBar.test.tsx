@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@mui/material';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 
@@ -39,7 +39,13 @@ describe('SearchBar', () => {
     renderBar({ onChange });
     const input = screen.getByPlaceholderText('Найти объявление....');
     await userEvent.type(input, 'iPhone');
-    expect(onChange).toHaveBeenCalled();
+
+    await waitFor(
+      () => {
+        expect(onChange).toHaveBeenCalled();
+      },
+      { timeout: 1000 }
+    );
   });
 
   it('renders grid layout button', () => {

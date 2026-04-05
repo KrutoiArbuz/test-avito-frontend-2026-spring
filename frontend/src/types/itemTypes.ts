@@ -60,14 +60,17 @@ export type ItemUpdateInApi = {
   params: ItemParamsApi;
 };
 
+export type ItemSortColumn = 'title' | 'createdAt' | 'price';
+export type ItemSortDirection = 'asc' | 'desc';
+
 export type ItemsQueryParamsApi = {
   q?: string;
   limit?: number;
   skip?: number;
   needsRevision?: true;
   categories?: CategoryType | string;
-  sortColumn?: 'title' | 'createdAt' | 'price';
-  sortDirection?: 'asc' | 'desc';
+  sortColumn?: ItemSortColumn;
+  sortDirection?: ItemSortDirection;
 };
 
 export type ItemListItemModel = ItemListItemApi;

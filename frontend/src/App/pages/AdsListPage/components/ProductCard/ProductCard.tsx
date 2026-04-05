@@ -3,6 +3,7 @@ import ImageOutlinedIcon from '@mui/icons-material/ImageOutlined';
 import { Box, Card, CardActionArea, CardContent, CardMedia, Chip, Typography } from '@mui/material';
 
 import type { CategoryType } from '@/types/itemTypes';
+import type { LayoutType } from '@/types/layoutType';
 import { getCategoryLabel } from '@/utils/normalizers';
 
 type ProductCardProps = {
@@ -11,7 +12,7 @@ type ProductCardProps = {
   price: number;
   imageUrl?: string;
   needsRevision: boolean;
-  layout?: 'grid' | 'list';
+  layout?: LayoutType;
   onClick?: () => void;
 };
 

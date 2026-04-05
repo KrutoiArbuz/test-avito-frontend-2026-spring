@@ -16,31 +16,19 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useEffect, useState } from 'react';
 
 import { useDebounce } from '@/hooks/useDebounce';
+import type { LayoutType } from '@/types/layoutType';
+import type { SortOptionType } from '@/types/sortOptionType';
 
-export type Layout = 'grid' | 'list';
-
-export type SortOption = {
-  value: string;
-  label: string;
-};
-
-export const SORT_OPTIONS: SortOption[] = [
-  { value: 'createdAt_desc', label: 'По новизне (сначала новые)' },
-  { value: 'createdAt_asc', label: 'По новизне (сначала старые)' },
-  { value: 'price_asc', label: 'По цене (дешевле)' },
-  { value: 'price_desc', label: 'По цене (дороже)' },
-  { value: 'title_asc', label: 'По названию (А → Я)' },
-  { value: 'title_desc', label: 'По названию (Я → А)' },
-];
+import { SORT_OPTIONS } from './constants';
 
 type SearchBarProps = {
   value: string;
   onChange: (value: string) => void;
-  layout: Layout;
-  onLayoutChange: (layout: Layout) => void;
+  layout: LayoutType;
+  onLayoutChange: (layout: LayoutType) => void;
   sortValue: string;
   onSortChange: (value: string) => void;
-  sortOptions?: SortOption[];
+  sortOptions?: SortOptionType[];
 };
 
 const SearchBar = ({

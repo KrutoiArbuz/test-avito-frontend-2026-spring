@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useItemsQuery } from '@/hooks/useItemsQuery';
-import { PAGE_SIZE, useAdsStore } from '@/stores/adsStore';
+import type { LayoutType } from '@/types/layoutType';
 import { parseSortParams } from '@/utils/parseSortParams';
+
+import { useAdsParams } from '../hooks/useAdsParams';
 
 import FiltersPanel from './components/FiltersPanel';
 import PageHeader from './components/PageHeader';
@@ -15,25 +17,30 @@ import SearchBar from './components/SearchBar';
 
 const ADS_PLURAL: [string, string, string] = ['объявление', 'объявления', 'объявлений'];
 
+const PAGE_SIZE: Record<LayoutType, number> = {
+  grid: 10,
+  list: 3,
+};
+
 const AdsListPage = () => {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const {
     search,
-    sort,
-    selectedCategories,
-    filterNeedsRevision,
-    layout,
-    page,
     setSearch,
+    sort,
     setSort,
-    setLayout,
+    selectedCategories,
     setSelectedCategories,
+    filterNeedsRevision,
     setFilterNeedsRevision,
+    layout,
+    setLayout,
+    page,
     setPage,
     resetFilters,
-  } = useAdsStore();
+  } = useAdsParams();
 
   const pageSize = PAGE_SIZE[layout];
   const { sortColumn, sortDirection } = parseSortParams(sort);
