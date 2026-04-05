@@ -19,16 +19,15 @@ const meta: Meta<typeof ItemImage> = {
 export default meta;
 type Story = StoryObj<typeof ItemImage>;
 
-export const WithImage: Story = {
-  args: {
-    title: 'MacBook Pro 16"',
-    imageUrl: 'https://via.placeholder.com/480x360',
-  },
-};
-
 export const Placeholder: Story = {
   args: {
     title: 'MacBook Pro 16"',
-    imageUrl: undefined,
+  },
+};
+
+export const MultipleImages: Story = {
+  args: {
+    title: 'MacBook Pro 16"',
+    imageUrls: ['', '', '', '', '', '', '', ''],
   },
 };
