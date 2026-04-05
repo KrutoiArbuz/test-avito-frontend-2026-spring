@@ -13,17 +13,17 @@ import {
 import { useState } from 'react';
 
 import ExpandMore from '@/components/ExpandMore';
-import type { Category } from '@/types/api';
+import type { CategoryType } from '@/types/itemTypes';
 
-const CATEGORY_OPTIONS: { value: Category; label: string }[] = [
+const CATEGORY_OPTIONS: { value: CategoryType; label: string }[] = [
   { value: 'auto', label: 'Авто' },
   { value: 'electronics', label: 'Электроника' },
   { value: 'real_estate', label: 'Недвижимость' },
 ];
 
 type FiltersPanelProps = {
-  selectedCategories: Category[];
-  onCategoriesChange: (categories: Category[]) => void;
+  selectedCategories: CategoryType[];
+  onCategoriesChange: (categories: CategoryType[]) => void;
   needsRevision: boolean;
   onNeedsRevisionChange: (value: boolean) => void;
   onReset: () => void;
@@ -36,7 +36,7 @@ const FiltersPanel = ({
   onNeedsRevisionChange,
   onReset,
 }: FiltersPanelProps) => {
-  const handleCategoryToggle = (category: Category) => {
+  const handleCategoryToggle = (category: CategoryType) => {
     if (selectedCategories.includes(category)) {
       onCategoriesChange(selectedCategories.filter((c) => c !== category));
     } else {
