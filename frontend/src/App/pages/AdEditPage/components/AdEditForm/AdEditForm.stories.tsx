@@ -21,16 +21,18 @@ type Story = StoryObj<typeof AdEditForm>;
 
 export const Default: Story = {
   args: {
+    id: 'item-1',
+    isSaving: false,
     onSave: (data) => alert(JSON.stringify(data, null, 2)),
     onCancel: () => alert('Cancelled'),
   },
 };
 
-export const Empty: Story = {
-  render: () => (
-    <AdEditForm
-      onSave={(data) => alert(JSON.stringify(data, null, 2))}
-      onCancel={() => alert('Cancelled')}
-    />
-  ),
+export const Saving: Story = {
+  args: {
+    id: 'item-2',
+    isSaving: true,
+    onSave: (data) => alert(JSON.stringify(data, null, 2)),
+    onCancel: () => alert('Cancelled'),
+  },
 };
