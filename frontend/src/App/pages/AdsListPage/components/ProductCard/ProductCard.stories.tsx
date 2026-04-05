@@ -37,13 +37,11 @@ export const Default: Story = {
   },
 };
 
-export const WithImage: Story = {
+export const WithoutImage: Story = {
   args: {
     category: 'auto',
     title: 'BMW 5 Series 530i 2021 года, состояние отличное',
     price: 3500000,
-    imageUrl:
-      'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=400&q=80',
     needsRevision: false,
     layout: 'list',
   },
@@ -59,13 +57,11 @@ export const NeedsRevision: Story = {
   },
 };
 
-export const NeedsRevisionWithImage: Story = {
+export const NeedsRevisionNoImage: Story = {
   args: {
     category: 'auto',
     title: 'Комплект зимних шин Michelin X-Ice',
     price: 45000,
-    imageUrl:
-      'https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=400&q=80',
     needsRevision: true,
     layout: 'list',
   },

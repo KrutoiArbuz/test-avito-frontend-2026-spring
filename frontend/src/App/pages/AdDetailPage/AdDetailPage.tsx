@@ -10,24 +10,27 @@ import {
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 
+import { useItemQuery } from '@/hooks/queries/useItemQuery';
+import { useItemEditDate } from '@/hooks/useItemEditDate';
+
 import ItemHeader from './components/ItemHeader';
 import ItemImage from './components/ItemImage';
 import ItemParams from './components/ItemParams';
 import ItemRevisionBanner from './components/ItemRevisionBanner';
-import { useItemQuery } from '@/hooks/queries/useItemQuery';
 
 const AdDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { data: item, isLoading, isError } = useItemQuery(id || '');
+  const { editDate } = useItemEditDate(id || '');
 
   return (
     <Box sx={{ backgroundColor: 'background.paper', minHeight: '100vh' }}>
       <Container maxWidth="xl" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Button
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/ads')}
             sx={{ color: '#000', display: 'flex', m: 0, px: 0, py: 1, pr: 1.5 }}
           >
             <ArrowBack sx={{ marginLeft: 0, marginRight: 1 }} />
@@ -57,7 +60,7 @@ const AdDetailPage = () => {
               title={item.title}
               price={item.price}
               createdAt={item.createdAt}
-              editAt={'0'}
+              editAt={editDate || undefined}
               onEdit={() => navigate(`/ads/${id}/edit`)}
             />
 

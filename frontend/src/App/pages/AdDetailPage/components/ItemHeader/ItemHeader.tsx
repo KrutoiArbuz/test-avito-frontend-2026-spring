@@ -5,7 +5,7 @@ type ItemHeaderProps = {
   title: string;
   price: number;
   createdAt: string;
-  editAt: string;
+  editAt?: string;
   onEdit: () => void;
 };
 
@@ -17,6 +17,8 @@ const ItemHeader = ({ title, price, createdAt, editAt, onEdit }: ItemHeaderProps
       hour: '2-digit',
       minute: '2-digit',
     });
+
+  const hasEditDate = editAt && editAt !== '0' && editAt.length > 0;
 
   return (
     <Stack direction="column" gap={1.5}>
@@ -48,9 +50,11 @@ const ItemHeader = ({ title, price, createdAt, editAt, onEdit }: ItemHeaderProps
           <Typography variant="caption" color="textSecondary">
             Опубликовано: {fmt(createdAt)}
           </Typography>
-          <Typography variant="caption" color="textSecondary">
-            Отредактировано: {fmt(editAt)}
-          </Typography>
+          {hasEditDate && (
+            <Typography variant="caption" color="textSecondary">
+              Отредактировано: {fmt(editAt)}
+            </Typography>
+          )}
         </Stack>
       </Stack>
     </Stack>
