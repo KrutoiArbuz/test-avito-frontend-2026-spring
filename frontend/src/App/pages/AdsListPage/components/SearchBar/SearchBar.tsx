@@ -13,6 +13,9 @@ import {
 } from '@mui/material';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { useEffect, useState } from 'react';
+
+import { useDebounce } from '@/hooks/useDebounce';
 
 export type Layout = 'grid' | 'list';
 
@@ -49,6 +52,19 @@ const SearchBar = ({
   onSortChange,
   sortOptions = SORT_OPTIONS,
 }: SearchBarProps) => {
+  const [localValue, setLocalValue] = useState(value);
+
+  const debouncedValue = useDebounce(localValue, 400);
+
+  useEffect(() => {
+    if (debouncedValue !== value) {
+      onChange(debouncedValue);
+    }
+  }, [debouncedValue, onChange, value]);
+
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
   return (
     <Box
       sx={{
@@ -64,8 +80,8 @@ const SearchBar = ({
       }}
     >
       <OutlinedInput
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
         placeholder="Найти объявление...."
         fullWidth
         sx={{

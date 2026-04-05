@@ -35,7 +35,7 @@ const AdsListPage = () => {
   } = useAdsStore();
 
   const pageSize = PAGE_SIZE[layout];
-  const [sortColumn, sortDirection] = sort.split('_') as [string, 'asc' | 'desc'];
+  const [sortColumn, sortDirection] = sort.split('_');
 
   const { data, isLoading, isError } = useItemsQuery({
     q: search.trim() || undefined,
