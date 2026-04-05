@@ -3,7 +3,7 @@ import { Box, Button, CircularProgress, Container, Drawer, Grid, Typography } fr
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { useItemsQuery } from '@/hooks/useItemsQuery';
+import { useItemsQuery } from '@/hooks/queries/useItemsQuery';
 import type { LayoutType } from '@/types/layoutType';
 import { parseSortParams } from '@/utils/parseSortParams';
 
