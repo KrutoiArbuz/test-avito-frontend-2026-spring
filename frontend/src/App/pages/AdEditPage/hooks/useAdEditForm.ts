@@ -16,17 +16,19 @@ export const useAdEditForm = (id: string, onSave: (data: ItemUpdateInApi) => voi
   const setStoreValues = useEditDraftStore((s) => s.setValues);
 
   const [values, setLocalValues] = useState<FormValues>(storedValues);
+
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [categoryTouched, setCategoryTouched] = useState<Record<string, boolean>>({});
 
   const hasUserEdited = useRef(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!hasUserEdited.current) {
       setLocalValues(storedValues);
     }
   }, [storedValues]);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const set = useCallback(
     <K extends keyof FormValues>(field: K, value: FormValues[K]) => {

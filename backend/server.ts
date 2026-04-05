@@ -190,13 +190,14 @@ fastify.put<ItemUpdateRequest>("/items/:id", (request, reply) => {
 });
 
 const port = process.env.PORT ? Number(process.env.PORT) : 8080;
+const host = process.env.HOST || "0.0.0.0";
 
-fastify.listen({ port }, function (err, _address) {
+fastify.listen({ port, host }, function (err, _address) {
     if (err) {
         fastify.log.error(err);
         process.exit(1);
     }
 
-    fastify.log.debug(`Server is listening on port ${port}`);
+    fastify.log.debug(`Server is listening at http://${host}:${port}`);
 });
 
