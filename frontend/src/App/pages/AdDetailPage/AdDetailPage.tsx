@@ -30,7 +30,7 @@ const AdDetailPage = () => {
       <Container maxWidth="xl" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Button
-            onClick={() => navigate('/ads')}
+            onClick={() => navigate(-1)}
             sx={{ color: '#000', display: 'flex', m: 0, px: 0, py: 1, pr: 1.5 }}
           >
             <ArrowBack sx={{ marginLeft: 0, marginRight: 1 }} />
