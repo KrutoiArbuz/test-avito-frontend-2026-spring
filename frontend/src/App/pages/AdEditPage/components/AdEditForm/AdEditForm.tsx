@@ -1,9 +1,9 @@
 import { Box, Button, Divider, Paper, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
 
 import { colors } from '@/config/theme';
-import type { CategoryType } from '@/types/itemTypes';
+import type { ItemUpdateInApi } from '@/types/itemTypes';
 
+import { useAdEditForm } from '../../hooks/useAdEditForm';
 import { AIButton } from '../AIButton';
 import { AIResultPopover } from '../AIResultPopover';
 import { CategoryFields } from '../CategoryFields';
@@ -11,7 +11,9 @@ import { FormField } from '../FormField';
 import { FormSelect } from '../FormSelect';
 
 type AdEditFormProps = {
-  onSave: (data: Record<string, unknown>) => void;
+  id: string;
+  isSaving: boolean;
+  onSave: (data: ItemUpdateInApi) => void;
   onCancel: () => void;
 };
 
@@ -21,107 +23,30 @@ const categoryOptions = [
   { label: 'Электроника', value: 'electronics' },
 ];
 
-export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
-  const [title, setTitle] = useState('MacBook Pro 16"');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('120000');
-  const [imageUrl, setImageUrl] = useState('');
-  const [category, setCategory] = useState<CategoryType>('electronics');
-  const [categoryFields, setCategoryFields] = useState<Record<string, string>>({
-    type: 'laptop',
-    brand: 'Apple',
-    model: 'M1 Pro',
-    color: 'Silver',
-    condition: 'new',
-  });
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [categoryTouched, setCategoryTouched] = useState<Record<string, boolean>>({});
-  const [descAiLoading, setDescAiLoading] = useState(false);
-  const [descAiResult, setDescAiResult] = useState('');
-  const [descAiDone, setDescAiDone] = useState(false);
+export const AdEditForm = ({ id, isSaving, onSave, onCancel }: AdEditFormProps) => {
+  const {
+    values,
+    touched,
+    categoryTouched,
+    set,
+    isValid,
+    titleError,
+    priceError,
+    descAi,
+    priceAi,
+    handleCategoryChange,
+    handleCategoryFieldChange,
+    handleDescAi,
+    handlePriceAi,
+    handleApplyDesc,
+    handleApplyPrice,
+    handleSave,
+  } = useAdEditForm(id, onSave);
 
-  const [priceAiLoading, setPriceAiLoading] = useState(false);
-  const [priceAiResult, setPriceAiResult] = useState('');
-  const [priceAiDone, setPriceAiDone] = useState(false);
-  const [descAiAnchorEl, setDescAiAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [priceAiAnchorEl, setPriceAiAnchorEl] = useState<HTMLButtonElement | null>(null);
-
-  const isValid = title.trim().length > 0 && category && price.trim().length > 0;
-  const titleError = touched.title && !title.trim();
-
-  const handleCategoryFieldChange = (field: string, value: string) => {
-    setCategoryFields({ ...categoryFields, [field]: value });
-    setCategoryTouched({ ...categoryTouched, [field]: true });
-  };
-
-  const handleDescAi = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setDescAiAnchorEl(e.currentTarget);
-    setDescAiLoading(true);
-    setTimeout(() => {
-      setDescAiResult(
-        'Продаю MacBook Pro 16" M1 Pro в отличном состоянии. Ноутбук работал бережно, все функции исправны. Полная комплектация, без царапин.'
-      );
-      setDescAiLoading(false);
-      setDescAiDone(true);
-    }, 1200);
-  };
-
-  const handlePriceAi = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setPriceAiAnchorEl(e.currentTarget);
-    setPriceAiLoading(true);
-    setTimeout(() => {
-      setPriceAiResult('Средняя цена: 115 000 – 135 000 ₽');
-      setPriceAiLoading(false);
-      setPriceAiDone(true);
-    }, 1200);
-  };
-
-  const handleApplyDesc = () => {
-    setDescription(descAiResult);
-    setDescAiDone(false);
-    setDescAiResult('');
-  };
-
-  const parsePrice = (text: string): string => {
-    const match = text.match(/(\d[\d\s]*\d)\s*[₽р]?/);
-    if (match) {
-      return match[1].replace(/\s/g, '');
-    }
-    return '';
-  };
-
-  const handleApplyPrice = () => {
-    const parsedPrice = parsePrice(priceAiResult);
-    if (parsedPrice) {
-      setPrice(parsedPrice);
-    }
-    setPriceAiDone(false);
-    setPriceAiResult('');
-  };
-
-  const handleSave = () => {
-    setTouched({ title: true });
-    if (!isValid) return;
-
-    const data = {
-      title,
-      description,
-      price: parseInt(price, 10),
-      imageUrl,
-      category,
-      params: categoryFields,
-    };
-    onSave(data);
-  };
+  const { category, title, price, description, imageUrl, params: categoryFields } = values;
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 4,
-      }}
-    >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Paper
         elevation={0}
         sx={{
@@ -141,7 +66,7 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
           <FormSelect
             label="Категория"
             value={category}
-            onChange={(val) => setCategory(val as CategoryType)}
+            onChange={handleCategoryChange}
             options={categoryOptions}
             required
             touched={touched.category}
@@ -151,12 +76,12 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
           <FormField
             label="Название"
             value={title}
-            onChange={setTitle}
+            onChange={(v) => set('title', v)}
             required
             touched={touched.title}
-            error={titleError}
+            error={!!titleError}
             placeholder="Введите название"
-            onClear={() => setTitle('')}
+            onClear={() => set('title', '')}
             bold
           />
           <Divider sx={{ my: 1, borderColor: colors.divider }} />
@@ -165,16 +90,17 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
             <FormField
               label="Цена, ₽"
               value={price}
-              onChange={setPrice}
+              onChange={(v) => set('price', v)}
               required
               touched={touched.price}
+              error={!!priceError}
               type="number"
               bold
             />
             <AIButton
-              isLoading={priceAiLoading}
+              isLoading={priceAi.isLoading}
               hasValue={price.length > 0}
-              hasResult={priceAiDone}
+              hasResult={priceAi.isDone}
               onClick={handlePriceAi}
               variant="price"
               sx={{ alignSelf: 'flex-start', mt: 3.5 }}
@@ -183,6 +109,7 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
         </Stack>
 
         <Divider sx={{ my: 1, borderColor: colors.divider }} />
+
         <CategoryFields
           category={category}
           values={categoryFields}
@@ -191,12 +118,13 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
         />
 
         <Divider sx={{ my: 1, borderColor: colors.divider }} />
+
         <Stack gap={3}>
           <Stack direction="column">
             <FormField
               label="Описание"
               value={description}
-              onChange={setDescription}
+              onChange={(v) => set('description', v)}
               multiline
               rows={4}
               placeholder="Опишите товар подробнее..."
@@ -204,9 +132,9 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
               bold
             />
             <AIButton
-              isLoading={descAiLoading}
+              isLoading={descAi.isLoading}
               hasValue={description.length > 0}
-              hasResult={descAiDone}
+              hasResult={descAi.isDone}
               onClick={handleDescAi}
               variant="description"
               sx={{ alignSelf: 'flex-start' }}
@@ -214,32 +142,26 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
           </Stack>
 
           <AIResultPopover
-            anchorEl={descAiDone ? descAiAnchorEl : null}
-            onClose={() => {
-              setDescAiDone(false);
-              setDescAiResult('');
-              setDescAiAnchorEl(null);
-            }}
-            result={descAiResult}
+            anchorEl={descAi.isDone ? descAi.anchorEl : null}
+            onClose={descAi.closePopover}
+            result={descAi.result}
+            error={descAi.error}
             onApply={handleApplyDesc}
           />
 
           <FormField
             label="Фото (URL)"
             value={imageUrl}
-            onChange={setImageUrl}
+            onChange={(v) => set('imageUrl', v)}
             placeholder="https://example.com/photo.jpg"
             touched={touched.imageUrl}
           />
 
           <AIResultPopover
-            anchorEl={priceAiDone ? priceAiAnchorEl : null}
-            onClose={() => {
-              setPriceAiDone(false);
-              setPriceAiResult('');
-              setPriceAiAnchorEl(null);
-            }}
-            result={priceAiResult}
+            anchorEl={priceAi.isDone ? priceAi.anchorEl : null}
+            onClose={priceAi.closePopover}
+            result={priceAi.result}
+            error={priceAi.error}
             onApply={handleApplyPrice}
           />
         </Stack>
@@ -247,7 +169,7 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
         <Stack direction="row" gap={1.3}>
           <Button
             variant="contained"
-            disabled={!isValid}
+            disabled={!isValid || isSaving}
             onClick={handleSave}
             sx={{
               minWidth: 108,
@@ -259,11 +181,12 @@ export const AdEditForm = ({ onSave, onCancel }: AdEditFormProps) => {
               lineHeight: 1.4,
             }}
           >
-            Сохранить
+            {isSaving ? 'Сохранение...' : 'Сохранить'}
           </Button>
           <Button
             variant="outlined"
             onClick={onCancel}
+            disabled={isSaving}
             sx={{
               minWidth: 108,
               backgroundColor: colors.divider,
