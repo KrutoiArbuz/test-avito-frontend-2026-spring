@@ -1,6 +1,5 @@
 export type CategoryType = 'auto' | 'real_estate' | 'electronics';
 
-
 export type AutoItemParamsApi = {
   brand?: string;
   model?: string;
@@ -67,10 +66,9 @@ export type ItemsQueryParamsApi = {
   skip?: number;
   needsRevision?: true;
   categories?: CategoryType | string;
-  sortColumn?: 'title' | 'createdAt';
+  sortColumn?: 'title' | 'createdAt' | 'price';
   sortDirection?: 'asc' | 'desc';
 };
-
 
 export type ItemListItemModel = ItemListItemApi;
 

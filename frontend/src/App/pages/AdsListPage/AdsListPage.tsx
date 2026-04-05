@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { useItemsQuery } from '@/hooks/useItemsQuery';
 import { PAGE_SIZE, useAdsStore } from '@/stores/adsStore';
+import { parseSortParams } from '@/utils/parseSortParams';
 
 import FiltersPanel from './components/FiltersPanel';
 import PageHeader from './components/PageHeader';
@@ -35,7 +36,7 @@ const AdsListPage = () => {
   } = useAdsStore();
 
   const pageSize = PAGE_SIZE[layout];
-  const [sortColumn, sortDirection] = sort.split('_');
+  const { sortColumn, sortDirection } = parseSortParams(sort);
 
   const { data, isLoading, isError } = useItemsQuery({
     q: search.trim() || undefined,
