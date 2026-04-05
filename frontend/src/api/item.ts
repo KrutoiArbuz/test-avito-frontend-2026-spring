@@ -1,5 +1,10 @@
 import { apiClient } from '@/config/api';
-import type { ItemApi, ItemsGetOutApi, ItemsQueryParamsApi } from '@/types/itemTypes';
+import type {
+  ItemApi,
+  ItemsGetOutApi,
+  ItemsQueryParamsApi,
+  ItemUpdateInApi,
+} from '@/types/itemTypes';
 
 export const getItems = async (
   { q, limit, skip, needsRevision, categories, sortColumn, sortDirection }: ItemsQueryParamsApi,
@@ -22,5 +27,10 @@ export const getItems = async (
 
 export const getItem = async (id: string, signal?: AbortSignal) => {
   const response = await apiClient.get<ItemApi>(`/items/${id}`, { signal });
+  return response.data;
+};
+
+export const updateItem = async (id: string, data: ItemUpdateInApi, signal?: AbortSignal) => {
+  const response = await apiClient.put<ItemApi>(`/items/${id}`, data, { signal });
   return response.data;
 };
