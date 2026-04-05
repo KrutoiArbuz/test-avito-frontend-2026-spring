@@ -1,0 +1,13 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.env.*.local
+dist
+build
+.git
+.gitignore
+README.md
+.storybook
+src/**/*.stories.tsx
+src/**/__unit__

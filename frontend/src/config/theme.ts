@@ -39,8 +39,7 @@ export const colors = {
 
   textPrimary: '#000000',
   textDark: '#1E1E1E',
-  textSecondary: '#757575',
-  textMuted: '#848388',
+  textSecondary: '#848388',
   textPlaceholder: '#707176',
   textInverse: '#FFFFFF',
   textDisabled: 'rgba(0,0,0,0.25)',
@@ -128,16 +127,17 @@ const baseTheme = createTheme({
 
   typography: {
     fontFamily: '"Roboto", "Inter", "Helvetica", "Arial", sans-serif',
-    button: { textTransform: 'none', fontWeight: 600 },
+    button: { textTransform: 'none', fontSize: 16, fontWeight: 400 },
 
-    h4: { fontSize: 30, fontWeight: 500, lineHeight: 1.33 },
-    h5: { fontSize: 22, fontWeight: 500, lineHeight: 1.27 },
-    h6: { fontSize: 18, fontWeight: 600, lineHeight: 1.22 },
-    subtitle1: { fontSize: 16, fontWeight: 500, lineHeight: 1.5 },
-    subtitle2: { fontSize: 14, fontWeight: 500, lineHeight: 1.57 },
-    body1: { fontSize: 15, fontWeight: 400, lineHeight: 1.46 },
-    body2: { fontSize: 14, fontWeight: 400, lineHeight: 1.57 },
-    caption: { fontSize: 13, fontWeight: 400, lineHeight: 1.23 },
+    h2: { fontSize: 30, fontWeight: 500, lineHeight: 1.33 },
+    h3: { fontSize: 22, fontWeight: 500, lineHeight: 1.27 },
+    h4: { fontSize: 16, fontWeight: 400, lineHeight: 1.25 },
+
+    subtitle1: { fontSize: 18, fontWeight: 400, lineHeight: 1 },
+    subtitle2: { fontSize: 16, fontWeight: 600, lineHeight: 1.4 },
+    body1: { fontSize: 14, fontWeight: 400, lineHeight: 1.57 },
+    body2: { fontSize: 14, fontWeight: 600, lineHeight: 1.4 },
+    caption: { fontSize: 16, fontWeight: 400, lineHeight: 1.4 },
   },
 
   components: {
@@ -169,15 +169,26 @@ const baseTheme = createTheme({
 
     MuiChip: {
       styleOverrides: {
-        root: { borderRadius: 6 },
+        root: {
+          borderRadius: 6,
+          padding: '0px 12px',
+          boxSizing: 'border-box',
+          fontSize: 14,
+          fontWeight: 400,
+          lineHeight: 1.57,
+        },
+        label: { padding: '0' },
+        icon: { margin: '0 8px 0 0' },
         outlined: {
           borderColor: colors.divider,
-          color: colors.textSecondary,
+          color: colors.textPrimary,
         },
         colorWarning: {
           backgroundColor: colors.warningBg,
           color: colors.warning,
-          borderRadius: 100,
+          borderRadius: 8,
+          padding: '0px 8px',
+
           border: 'none',
         },
         colorSuccess: {
@@ -263,13 +274,22 @@ const baseTheme = createTheme({
         root: {
           borderRadius: 8,
           padding: '10px',
+          fontSize: 14,
+          fontWeight: 400,
+          backgroundColor: colors.bgPage,
           border: `1px solid ${colors.divider}`,
           '&.Mui-selected': {
             border: `1px solid ${colors.primary}`,
             color: colors.primary,
             backgroundColor: colors.bgPage,
-            fontWeight: 700,
+
+            fontWeight: 500,
             '&:hover': { backgroundColor: colors.bgSearch },
+          },
+          '&.MuiPaginationItem-ellipsis': {
+            border: 'none',
+            backgroundColor: 'transparent',
+            color: colors.textPrimary,
           },
         },
       },
@@ -279,6 +299,32 @@ const baseTheme = createTheme({
       defaultProps: {
         anchorOrigin: { vertical: 'top', horizontal: 'right' },
         autoHideDuration: 4000,
+      },
+    },
+
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        root: {
+          border: '2px solid transparent',
+          borderRadius: 8,
+          backgroundColor: colors.bgSearch,
+          '& .MuiToggleButton-root': {
+            fontSize: 18,
+            backgroundColor: colors.bgSearch,
+            border: 'none',
+            padding: '0px 8px',
+            color: colors.textPrimary,
+            '&:hover': { backgroundColor: colors.bgStroke },
+          },
+          '& .MuiDivider-root': {
+            backgroundColor: colors.bgPage,
+          },
+          '& .MuiToggleButton-root.Mui-selected': {
+            color: colors.primary,
+            backgroundColor: colors.bgSearch,
+            '&:hover': { backgroundColor: colors.bgStroke },
+          },
+        },
       },
     },
   },

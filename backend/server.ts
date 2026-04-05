@@ -1,175 +1,203 @@
-import Fastify from 'fastify';
+import Fastify from "fastify";
 
-import items from 'data/items.json' with { type: 'json' };
-import { Item } from 'src/types.ts';
-import { ItemsGetInQuerySchema, ItemUpdateInSchema } from 'src/validation.ts';
-import { treeifyError, ZodError } from 'zod';
-import { doesItemNeedRevision } from './src/utils.ts';
+import items from "data/items.json" with { type: "json" };
+import { Item } from "src/types.ts";
+import { ItemsGetInQuerySchema, ItemUpdateInSchema } from "src/validation.ts";
+import { treeifyError, ZodError } from "zod";
+import { doesItemNeedRevision } from "./src/utils.ts";
 
 const ITEMS = items as Item[];
 
 const fastify = Fastify({
-  logger: true,
+    logger: true,
 });
 
-await fastify.register((await import('@fastify/middie')).default);
+await fastify.register((await import("@fastify/middie")).default);
 
 // Искуственная задержка ответов, чтобы можно было протестировать состояния загрузки
 fastify.use((_, __, next) =>
-  new Promise(res => setTimeout(res, 300 + Math.random() * 700)).then(next),
+    new Promise((res) => setTimeout(res, 300 + Math.random() * 700)).then(next),
 );
 
 // Настройка CORS
-fastify.use((_, reply, next) => {
-  reply.setHeader('Access-Control-Allow-Origin', '*');
-  next();
+fastify.use((request, reply, next) => {
+    reply.setHeader("Access-Control-Allow-Origin", "*");
+    reply.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, PUT, POST, PATCH, DELETE, OPTIONS",
+    );
+    reply.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, Authorization",
+    );
+
+    if (request.method === "OPTIONS") {
+        reply.statusCode = 204;
+        reply.end();
+        return;
+    }
+
+    next();
 });
 
 interface ItemGetRequest extends Fastify.RequestGenericInterface {
-  Params: {
-    id: string;
-  };
+    Params: {
+        id: string;
+    };
 }
 
-fastify.get<ItemGetRequest>('/items/:id', (request, reply) => {
-  const itemId = Number(request.params.id);
+fastify.get<ItemGetRequest>("/items/:id", (request, reply) => {
+    const itemId = Number(request.params.id);
 
-  if (!Number.isFinite(itemId)) {
-    reply
-      .status(400)
-      .send({ success: false, error: 'Item ID path param should be a number' });
-    return;
-  }
+    if (!Number.isFinite(itemId)) {
+        reply.status(400).send({
+            success: false,
+            error: "Item ID path param should be a number",
+        });
+        return;
+    }
 
-  const item = ITEMS.find(item => item.id === itemId);
+    const item = ITEMS.find((item) => item.id === itemId);
 
-  if (!item) {
-    reply
-      .status(404)
-      .send({ success: false, error: "Item with requested id doesn't exist" });
-    return;
-  }
+    if (!item) {
+        reply.status(404).send({
+            success: false,
+            error: "Item with requested id doesn't exist",
+        });
+        return;
+    }
 
-  return {
-    ...item,
-    needsRevision: doesItemNeedRevision(item),
-  };
+    return {
+        ...item,
+        needsRevision: doesItemNeedRevision(item),
+    };
 });
 
 interface ItemsGetRequest extends Fastify.RequestGenericInterface {
-  Querystring: {
-    q?: string;
-    limit?: string;
-    skip?: string;
-    categories?: string;
-    needsRevision?: string;
-  };
+    Querystring: {
+        q?: string;
+        limit?: string;
+        skip?: string;
+        categories?: string;
+        needsRevision?: string;
+    };
 }
 
-fastify.get<ItemsGetRequest>('/items', request => {
-  const {
-    q,
-    limit,
-    skip,
-    needsRevision,
-    categories,
-    sortColumn,
-    sortDirection,
-  } = ItemsGetInQuerySchema.parse(request.query);
+fastify.get<ItemsGetRequest>("/items", (request) => {
+    const {
+        q,
+        limit,
+        skip,
+        needsRevision,
+        categories,
+        sortColumn,
+        sortDirection,
+    } = ItemsGetInQuerySchema.parse(request.query);
 
-  const filteredItems = ITEMS.filter(item => {
-    return (
-      item.title.toLowerCase().includes(q.toLowerCase()) &&
-      (!needsRevision || doesItemNeedRevision(item)) &&
-      (!categories?.length ||
-        categories.some(category => item.category === category))
-    );
-  });
+    const filteredItems = ITEMS.filter((item) => {
+        return (
+            item.title.toLowerCase().includes(q.toLowerCase()) &&
+            (!needsRevision || doesItemNeedRevision(item)) &&
+            (!categories?.length ||
+                categories.some((category) => item.category === category))
+        );
+    });
 
-  return {
-    items: filteredItems
-      .toSorted((item1, item2) => {
-        let comparisonValue = 0;
+    return {
+        items: filteredItems
+            .toSorted((item1, item2) => {
+                let comparisonValue = 0;
 
-        if (!sortDirection) return comparisonValue;
+                if (!sortDirection) return comparisonValue;
 
-        if (sortColumn === 'title') {
-          comparisonValue = item1.title.localeCompare(item2.title);
-        } else if (sortColumn === 'createdAt') {
-          comparisonValue =
-            new Date(item1.createdAt).valueOf() -
-            new Date(item2.createdAt).valueOf();
-        }
+                if (sortColumn === "title") {
+                    comparisonValue = item1.title.localeCompare(item2.title);
+                } else if (sortColumn === "createdAt") {
+                    comparisonValue =
+                        new Date(item1.createdAt).valueOf() -
+                        new Date(item2.createdAt).valueOf();
+                } else if (sortColumn === "price") {
+                    const price1 = item1.price ?? 0;
+                    const price2 = item2.price ?? 0;
+                    comparisonValue = price1 - price2;
+                }
 
-        return (sortDirection === 'desc' ? -1 : 1) * comparisonValue;
-      })
-      .slice(skip, skip + limit)
-      .map(item => ({
-        category: item.category,
-        title: item.title,
-        price: item.price,
-        needsRevision: doesItemNeedRevision(item),
-      })),
-    total: filteredItems.length,
-  };
+                return (sortDirection === "desc" ? -1 : 1) * comparisonValue;
+            })
+            .slice(skip, skip + limit)
+            .map((item) => ({
+                id: item.id,
+                category: item.category,
+                title: item.title,
+                price: item.price,
+                needsRevision: doesItemNeedRevision(item),
+            })),
+        total: filteredItems.length,
+    };
 });
 
 interface ItemUpdateRequest extends Fastify.RequestGenericInterface {
-  Params: {
-    id: string;
-  };
+    Params: {
+        id: string;
+    };
 }
 
-fastify.put<ItemUpdateRequest>('/items/:id', (request, reply) => {
-  const itemId = Number(request.params.id);
+fastify.put<ItemUpdateRequest>("/items/:id", (request, reply) => {
+    const itemId = Number(request.params.id);
 
-  if (!Number.isFinite(itemId)) {
-    reply
-      .status(400)
-      .send({ success: false, error: 'Item ID path param should be a number' });
-    return;
-  }
-
-  const itemIndex = ITEMS.findIndex(item => item.id === itemId);
-
-  if (itemIndex === -1) {
-    reply
-      .status(404)
-      .send({ success: false, error: "Item with requested id doesn't exist" });
-    return;
-  }
-
-  try {
-    const parsedData = ItemUpdateInSchema.parse({
-      category: ITEMS[itemIndex].category,
-      ...(request.body as {}),
-    });
-
-    ITEMS[itemIndex] = {
-      id: ITEMS[itemIndex].id,
-      createdAt: ITEMS[itemIndex].createdAt,
-      updatedAt: new Date().toISOString(),
-      ...parsedData,
-    };
-
-    return { success: true };
-  } catch (error) {
-    if (error instanceof ZodError) {
-      reply.status(400).send({ success: false, error: treeifyError(error) });
-      return;
+    if (!Number.isFinite(itemId)) {
+        reply.status(400).send({
+            success: false,
+            error: "Item ID path param should be a number",
+        });
+        return;
     }
 
-    throw error;
-  }
+    const itemIndex = ITEMS.findIndex((item) => item.id === itemId);
+
+    if (itemIndex === -1) {
+        reply.status(404).send({
+            success: false,
+            error: "Item with requested id doesn't exist",
+        });
+        return;
+    }
+
+    try {
+        const parsedData = ItemUpdateInSchema.parse({
+            category: ITEMS[itemIndex].category,
+            ...(request.body as {}),
+        });
+
+        ITEMS[itemIndex] = {
+            id: ITEMS[itemIndex].id,
+            createdAt: ITEMS[itemIndex].createdAt,
+            updatedAt: new Date().toISOString(),
+            ...parsedData,
+        };
+
+        return { success: true };
+    } catch (error) {
+        if (error instanceof ZodError) {
+            reply
+                .status(400)
+                .send({ success: false, error: treeifyError(error) });
+            return;
+        }
+
+        throw error;
+    }
 });
 
-const port = Number(process.env.port) ?? 8080;
+const port = process.env.PORT ? Number(process.env.PORT) : 8080;
+const host = process.env.HOST || "0.0.0.0";
 
-fastify.listen({ port }, function (err, _address) {
-  if (err) {
-    fastify.log.error(err);
-    process.exit(1);
-  }
+fastify.listen({ port, host }, function (err, _address) {
+    if (err) {
+        fastify.log.error(err);
+        process.exit(1);
+    }
 
-  fastify.log.debug(`Server is listening on port ${port}`);
+    fastify.log.debug(`Server is listening at http://${host}:${port}`);
 });
+
